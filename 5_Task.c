@@ -71,14 +71,31 @@ int main(void) {
 static void init_task(void *pvParameters)
 {
 	for(;;)
-	{	// Configura pines. Led´s R, G, B.
-		gpio_pin_config_t ledR_config = {kGPIO_DigitalOutput, 1,};
-		gpio_pin_config_t ledG_config = {kGPIO_DigitalOutput, 1,};
-		gpio_pin_config_t ledB_config = {kGPIO_DigitalOutput, 1,};
+	{	//iniciaización de los leds
+		gpio_pin_config_t ledB_config = {kGPIO_DigitalOutput, 1,
+		                  };
+		gpio_pin_config_t ledR_config = {kGPIO_DigitalOutput, 1,
+		                  };
+		gpio_pin_config_t ledG_config = {kGPIO_DigitalOutput, 1,
+		                  };
 
+		gpio_pin_config_t PORTE_config = {kGPIO_DigitalOutput, 0,
+				                  };
+
+		GPIO_PinInit(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PIN, &ledB_config);
 		GPIO_PinInit(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN, &ledR_config);
 	    GPIO_PinInit(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PIN, &ledG_config);
-		GPIO_PinInit(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PIN, &ledB_config);
+
+		GPIO_PinInit(GPIOE, 1U, &PORTE_config);
+		GPIO_PinInit(GPIOE, 2U, &PORTE_config);
+		GPIO_PinInit(GPIOE, 3U, &PORTE_config);
+		GPIO_PinInit(GPIOE, 4U, &PORTE_config);
+
+		PORT_SetPinMux(PORTE, 1U, kPORT_MuxAsGpio);
+		PORT_SetPinMux(PORTE, 2U, kPORT_MuxAsGpio);
+		PORT_SetPinMux(PORTE, 3U, kPORT_MuxAsGpio);
+		PORT_SetPinMux(PORTE, 4U, kPORT_MuxAsGpio);
+
 		vTaskSuspend(NULL);
 	}
 }
@@ -139,23 +156,6 @@ static void task_motor(void *pvParameters)
 	while(1)
 	{
 	xSemaphoreTake(xMutex, portMAX_DELAY);
-
-		 SIM->SCGC5|=SIM_SCGC5_PORTE_MASK;		// Activar el reloj del puerto E
-
-		 // Bits 0-7 puerto E como GPIO
-		 PORTE->PCR[0] |= 1<<8;
-		 PORTE->PCR[1] |= 1<<8;
-	   	 PORTE->PCR[2] |= 1<<8;
-		 PORTE->PCR[3] |= 1<<8;
-		 PORTE->PCR[4] |= 1<<8;
-		 PORTE->PCR[5] |= 1<<8;
-		 PORTE->PCR[6] |= 1<<8;
-		 PORTE->PCR[7] |= 1<<8;
-
-		 // Bits 0-7 puerto E como salida
-		 GPIOE->PDDR   |= 0xFF;
-
-
 
 		 // Secuencia 5, 6, A, 9
 
